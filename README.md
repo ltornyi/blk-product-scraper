@@ -28,3 +28,12 @@ Approach:
 - - If this component exists and if it has a 'data-ajaxuri', then call the API and process the results.
 - If there's no allHoldingsTab child node, find the child node with id='tenLargestTab'.
 - - If this child exists, then find all the child table nodes of it and parse the body of each table.
+
+Interesting examples:
+
+    download link:                                      node dist/index.js holdings -p 227349 -s US-I
+    no download link, all tab:                          node dist/index.js holdings -p 230317 -s US-I
+    no download link, no all tab, only #tenLargestTab:  node dist/index.js holdings -p 227891 -s US-I
+    download link:                                      node dist/index.js holdings -p 239726 -s US-I
+    double tenLargestTab:                               node dist/index.js holdings -p 228282
+    no product page url:                                node dist/index.js holdings -p 230120

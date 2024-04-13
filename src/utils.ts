@@ -1,6 +1,9 @@
+import puppeteer, { Browser, Page } from "puppeteer";
+
 export const DATA_PATH = './data/';
 export const PRODUCT_FILE_SUFFIX = '.products.json';
-export const HOLDINGS_FILE_SUFFIX = '.holdings.json';
+export const HOLDINGS_FILE_SUFFIX = '.holdings.jsonl';
+export const SITEENTRY_PASS = '?switchLocale=y&siteEntryPassthrough=true';
 
 export type SiteInfo = {
   host: string,
@@ -26,3 +29,19 @@ export const getSiteOption = (option:any) => {
   const site = option.site ? option.site : 'UK-I';
   return site as keyof typeof BLK_PRODUCT_SITES;
 }
+
+export const getProductsOption = (option:any) => {
+  const site = (option.products ? option.products : 'all') as string;
+  return site;
+}
+
+interface BrowserAndPage {
+  browser: Browser;
+  page: Page;
+}
+
+export const getBrowserAndPage = async (): Promise<BrowserAndPage> => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  return { browser, page };
+};

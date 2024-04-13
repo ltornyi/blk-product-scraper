@@ -19,6 +19,7 @@ const main = async () => {
     .command('holdings')
     .description('Download holdings for products already downloaded')
     .option("-s, --site [value]", "Which site to use. Supported: UK-I (UK individual), US-I (US individual) ")
+    .option("-p, --products [value]", "Which products to look at. Can be: all | top10 | <portfolioid> ")
     .action(downloadHoldings);
   await program.parseAsync(process.argv);
 }

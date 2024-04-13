@@ -1,4 +1,4 @@
-const fs = require('node:fs');
+import fs from 'node:fs';
 
 import { BLK_PRODUCT_SITES, DATA_PATH, PRODUCT_FILE_SUFFIX, getSiteOption } from './utils'
 
@@ -88,4 +88,9 @@ const parseUSProducts = (products: any): Product[] => {
 const saveProducts = (products: Product[], filename: string) => {
   const content = JSON.stringify(products);
   fs.writeFileSync(DATA_PATH + filename, content);
+}
+
+export const loadProducts = (site: string | number): Product[] => {
+  const content = fs.readFileSync(DATA_PATH + site + PRODUCT_FILE_SUFFIX, 'utf8');
+  return JSON.parse(content);
 }
