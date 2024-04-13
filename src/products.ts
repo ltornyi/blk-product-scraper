@@ -16,7 +16,7 @@ export type Product = {
 export const downloadProducts = async (options: any) => {
   const site = getSiteOption(options) as keyof typeof BLK_PRODUCT_SITES;
   console.log('downloading products from', site);
-  const url = BLK_PRODUCT_SITES[site];
+  const url = BLK_PRODUCT_SITES[site].host + BLK_PRODUCT_SITES[site].screener;
   const response = await fetch(url);
   const products = await response.json();
 
