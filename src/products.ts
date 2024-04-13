@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 
-import { BLK_PRODUCT_SITES, DATA_PATH, getSiteOption } from './utils'
+import { BLK_PRODUCT_SITES, DATA_PATH, PRODUCT_FILE_SUFFIX, getSiteOption } from './utils'
 
 export type Product = {
   assetClass: string,
@@ -14,15 +14,16 @@ export type Product = {
 }
 
 export const downloadProducts = async (options: any) => {
-  const site = getSiteOption(options) as keyof typeof BLK_PRODUCT_SITES;
-  console.log('downloading products from', site);
+  const site = getSiteOption(options);
+  console.log('Downloading products from', site);
   const url = BLK_PRODUCT_SITES[site].host + BLK_PRODUCT_SITES[site].screener;
   const response = await fetch(url);
   const products = await response.json();
 
   const myProducts = parseProducts(products, site);
-  
-  saveProducts(myProducts, site + '.json')
+  saveProducts(myProducts, site + PRODUCT_FILE_SUFFIX)
+
+  console.log('Done');
 }
 
 const parseProducts = (products: any, site: keyof typeof BLK_PRODUCT_SITES): Product[] => {

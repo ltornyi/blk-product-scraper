@@ -1,4 +1,6 @@
 export const DATA_PATH = './data/';
+export const PRODUCT_FILE_SUFFIX = '.products.json';
+export const HOLDINGS_FILE_SUFFIX = '.holdings.json';
 
 export type SiteInfo = {
   host: string,
@@ -22,5 +24,5 @@ export const BLK_PRODUCT_SITES: BlkProductSites = {
 
 export const getSiteOption = (option:any) => {
   const site = option.site ? option.site : 'UK-I';
-  return site;
+  return site as keyof typeof BLK_PRODUCT_SITES;
 }
