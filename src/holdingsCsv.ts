@@ -4,7 +4,8 @@ import { ProductHolding } from "./holdings";
 enum CsvType {
   NAME0_W1,
   NAME0_W3,
-  NAME1_AC3_W5
+  NAME1_AC3_W5,
+  NAME1_AC4_W6,
 }
 
 const HEADER_NAME = 'Name'
@@ -54,10 +55,15 @@ const getHoldingFromRecord = (fields:string[], csvType: CsvType, productPortfoli
       weight = parseFloat(fields[3])
       break;
     case CsvType.NAME1_AC3_W5:
-        name = fields[1];
-        kind = fields[3];
-        weight = parseFloat(fields[5])
-        break;
+      name = fields[1];
+      kind = fields[3];
+      weight = parseFloat(fields[5])
+      break;
+    case CsvType.NAME1_AC4_W6:
+      name = fields[1];
+      kind = fields[4];
+      weight = parseFloat(fields[6])
+      break;
     default:
       break;
   }
@@ -71,6 +77,8 @@ const getCsvTypeFromHeader = (header: string[]) => {
   const indexWeight = header.findIndex(label => label == HEADER_WEIGHT);
   if (indexName == 1 && indexAC == 3 && indexWeight == 5) {
     return CsvType.NAME1_AC3_W5
+  } else if (indexName == 1 && indexAC == 4 && indexWeight == 6) {
+    return CsvType.NAME1_AC4_W6
   } else if (indexName == 0 && indexAC == -1 && indexWeight == 1) {
     return CsvType.NAME0_W1
   } else if (indexName == 0 && indexAC == -1 && indexWeight == 3) {
