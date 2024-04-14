@@ -42,3 +42,4 @@ Interesting examples:
     no download link, no all tab, only #tenLargestTab:  node dist/index.js holdings -p 227891 -s US-I
     double tenLargestTab:                               node dist/index.js holdings -p 228282
     no product page url:                                node dist/index.js holdings -p 230120
+    no holdings component:                              node dist/index.js holdings -p 283365

@@ -137,6 +137,7 @@ const getProductHoldingsFromAjax = async (uri: string, productPortfolioId: numbe
   } else {
     const json = await response.json();
     console.log(`productPortfolioId ${productPortfolioId}, fileType!==csv`, JSON.stringify(json))
+    throw Error('Only CSV is handled at the moment');
   }
 
   return productHoldings;
