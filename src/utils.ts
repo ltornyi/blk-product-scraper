@@ -31,8 +31,13 @@ export const getSiteOption = (option:any) => {
 }
 
 export const getProductsOption = (option:any) => {
-  const site = (option.products ? option.products : 'all') as string;
-  return site;
+  const products = (option.products ? option.products : 'all') as string;
+  return products;
+}
+
+export const getContinueOption = (option:any) => {
+  const cont = (option.continue ? option.continue : '') as string;
+  return cont;
 }
 
 interface BrowserAndPage {

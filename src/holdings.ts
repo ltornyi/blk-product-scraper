@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { ElementHandle, Page } from "puppeteer";
-import { BLK_PRODUCT_SITES, DATA_PATH, HOLDINGS_FILE_SUFFIX, SITEENTRY_PASS, getBrowserAndPage, getProductsOption, getSiteOption } from "./utils";
+import { BLK_PRODUCT_SITES, DATA_PATH, HOLDINGS_FILE_SUFFIX, SITEENTRY_PASS, getBrowserAndPage, getContinueOption, getProductsOption, getSiteOption } from "./utils";
 import { Product, loadProducts } from "./products";
 import { processBlkCsv } from './holdingsCsv';
 
@@ -17,6 +17,7 @@ export const downloadHoldings = async (options: any) => {
   const site = getSiteOption(options);
   const host = BLK_PRODUCT_SITES[site].host;
   const products = getProductsOption(options);
+  const cont = getContinueOption(options);
   const productData = loadProducts(site);
 
   console.log(`Downloading holdings from ${site}, products: ${products}`);
@@ -24,10 +25,10 @@ export const downloadHoldings = async (options: any) => {
 
   switch (products) {
     case 'all':
-      await downloadHoldingsForAll(page, host, productData, site)
+      await downloadHoldingsForAll(page, host, productData, site, cont)
       break;
     case 'top10':
-      await downloadHoldingsForTop10(page, host, productData, site);
+      await downloadHoldingsForTop10(page, host, productData, site, cont);
       break;
     default:
       await downloadHoldingsForOneProduct(page, host, productData, parseInt(products), site)
@@ -47,8 +48,9 @@ const downloadHoldingsForOneProduct = async (page: Page, host: string, productDa
   }
 }
 
-const downloadHoldingsForAll = async (page: Page, host: string, productData: Product[], site: string|number) => {
-  for (const prd of productData) {
+const downloadHoldingsForAll = async (page: Page, host: string, productData: Product[], site: string|number, cont: string) => {
+  const startingIndex = getStartingIndex(productData, cont);
+  for (const prd of productData.slice(startingIndex)) {
     if (prd.productPageUrl) {
       const scraped = await scrapeHoldingsForProduct(page, prd.portfolioId, host, prd.productPageUrl);
       appendProductHoldings(scraped, site)
@@ -56,13 +58,22 @@ const downloadHoldingsForAll = async (page: Page, host: string, productData: Pro
   }
 }
 
-const downloadHoldingsForTop10 = async (page: Page, host: string, productData: Product[], site: string|number) => {
-  for (const prd of productData.slice(0,10)) {
+const downloadHoldingsForTop10 = async (page: Page, host: string, productData: Product[], site: string|number, cont: string) => {
+  const startingIndex = getStartingIndex(productData, cont);
+  for (const prd of productData.slice(startingIndex, startingIndex+10)) {
     if (prd.productPageUrl) {
       const scraped = await scrapeHoldingsForProduct(page, prd.portfolioId, host, prd.productPageUrl);
       appendProductHoldings(scraped, site)
     }
   };
+}
+
+const getStartingIndex = (productData: Product[], cont: string) => {
+  const startingIndex = cont ? productData.findIndex(pr => pr.portfolioId == parseInt(cont)) : 0
+  if (startingIndex == -1) {
+    throw Error(`Cannot continue from ${cont}: no such portfolioId in products`)
+  }
+  return startingIndex;
 }
 
 const appendProductHoldings = (scraped:ProductHolding[], site: string | number) => {
