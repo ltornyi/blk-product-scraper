@@ -6,6 +6,7 @@ enum CsvType {
   NAME0_W3,
   NAME1_AC3_W5,
   NAME1_AC4_W6,
+  NAME0_AC2_W4,
 }
 
 const HEADER_NAME = 'Name'
@@ -15,6 +16,10 @@ const HEADER_WEIGHT = 'Weight (%)'
 export const processBlkCsv = (productPortfolioId: number, text: string) => {
   let arr: ProductHolding[] = [];
   let csv = text.split('\n').map(line => line.trim());
+  if (csv.length < 2) {
+    console.debug(`Empty CSV for ${productPortfolioId}`);
+    return arr;
+  }
   //find first empty line and consider body starting after it
   let indexOfEmpty = csv.findIndex(line => !line);
   if (indexOfEmpty) {
@@ -64,6 +69,11 @@ const getHoldingFromRecord = (fields:string[], csvType: CsvType, productPortfoli
       kind = fields[4];
       weight = parseFloat(fields[6])
       break;
+    case CsvType.NAME0_AC2_W4:
+      name = fields[0];
+      kind = fields[2];
+      weight = parseFloat(fields[4])
+      break;
     default:
       break;
   }
@@ -83,6 +93,8 @@ const getCsvTypeFromHeader = (header: string[]) => {
     return CsvType.NAME0_W1
   } else if (indexName == 0 && indexAC == -1 && indexWeight == 3) {
     return CsvType.NAME0_W3
+  } else if (indexName == 0 && indexAC == 2 && indexWeight == 4) {
+    return CsvType.NAME0_AC2_W4
   } else {
     throw Error(`Unknown CSV format ${header}`)
   }
