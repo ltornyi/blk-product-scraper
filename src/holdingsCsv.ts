@@ -7,6 +7,7 @@ enum CsvType {
   NAME1_AC3_W5,
   NAME1_AC4_W6,
   NAME0_AC2_W4,
+  NAME0_AC3_W5,
 }
 
 const HEADER_NAME = 'Name'
@@ -74,6 +75,11 @@ const getHoldingFromRecord = (fields:string[], csvType: CsvType, productPortfoli
       kind = fields[2];
       weight = parseFloat(fields[4])
       break;
+    case CsvType.NAME0_AC3_W5:
+      name = fields[0];
+      kind = fields[3];
+      weight = parseFloat(fields[5])
+      break;
     default:
       break;
   }
@@ -95,6 +101,8 @@ const getCsvTypeFromHeader = (header: string[]) => {
     return CsvType.NAME0_W3
   } else if (indexName == 0 && indexAC == 2 && indexWeight == 4) {
     return CsvType.NAME0_AC2_W4
+  } else if (indexName == 0 && indexAC == 3 && indexWeight == 5) {
+    return CsvType.NAME0_AC3_W5
   } else {
     throw Error(`Unknown CSV format ${header}`)
   }
