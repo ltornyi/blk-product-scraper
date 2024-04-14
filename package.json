@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "commander": "^12.0.0",
+    "csv-parse": "^5.5.5",
     "puppeteer": "^22.6.4"
   },
   "devDependencies": {

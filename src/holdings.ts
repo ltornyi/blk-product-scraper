@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { ElementHandle, Page } from "puppeteer";
 import { BLK_PRODUCT_SITES, DATA_PATH, HOLDINGS_FILE_SUFFIX, SITEENTRY_PASS, getBrowserAndPage, getProductsOption, getSiteOption } from "./utils";
 import { Product, loadProducts } from "./products";
+import { processBlkCsv } from './holdingsCsv';
 
 export type ProductHolding = {
   productPortfolioId: number,
@@ -117,26 +118,14 @@ const getProductHoldingsFromXlsExport = async (iconXlsExport: ElementHandle, pro
 }
 
 const getProductHoldingsFromAjax = async (uri: string, productPortfolioId: number) => {
-  const productHoldings: ProductHolding[] = [];
+  let productHoldings: ProductHolding[] = [];
   const response = await fetch(uri);
   if (uri.indexOf('fileType=csv')) {
     const text = await response.text();
-    const csv = text.split('\n').slice(3)
-    // console.log('fileType=csv', csv)
-    let i = 0;
-    let line = csv[i].trim();
-    while (line) {
-      const cols = line.split(',')
-      const name = cols[0].replace(/"/g,'')
-      const weight = parseFloat(cols[1].replace(/"/g,''));
-      const pr: ProductHolding = {productPortfolioId, name, weight}
-      productHoldings.push(pr);
-      i++;
-      line = csv[i].trim();
-    }
+    productHoldings = processBlkCsv(productPortfolioId, text)
   } else {
     const json = await response.json();
-    console.log('fileType!==csv', JSON.stringify(json))
+    console.log(`productPortfolioId ${productPortfolioId}, fileType!==csv`, JSON.stringify(json))
   }
 
   return productHoldings;
@@ -147,21 +136,21 @@ const extractFromTenLargestTab = async (holdings: ElementHandle, productPortfoli
   const tenLargestTab = await holdings.$('#tenLargestTab');
   if (tenLargestTab) {
     productHoldings = await extractChildHoldingTables(tenLargestTab, productPortfolioId, 'unknown')
-    console.debug(`Holdings extracted from tenLargestTab: ${JSON.stringify(productHoldings)}`)
+    console.debug('Holdings extracted from tenLargestTab')
     await tenLargestTab.dispose();
   } else {
     console.debug('No #tenLargestTab, looking for #tabsTop-holding-eq');
     const holdingEq = await holdings.$('#tabsTop-holding-eq');
     if (holdingEq) {
       productHoldings = await extractChildHoldingTables(holdingEq, productPortfolioId, 'equity')
-      console.debug(`productHoldings extracted from tabsTop-holding-eq: ${JSON.stringify(productHoldings)}`)
+      console.debug('productHoldings extracted from tabsTop-holding-eq')
       console.debug('Will find and click on tabsTop-holding-fi anchor');
       const holdingsTabsLastAnchor = await holdings.$('#holdingsTabs > a:last-child');
       await holdingsTabsLastAnchor?.click();
       const holdingFi = await holdings.$('#tabsTop-holding-fi');
       if (holdingFi) {
         const productHoldingsFi = await extractChildHoldingTables(holdingFi, productPortfolioId, 'fixed')
-        console.debug(`productHoldings extracted from tabsTop-holding-fi: ${JSON.stringify(productHoldingsFi)}`)
+        console.debug('productHoldings extracted from tabsTop-holding-fi')
         productHoldingsFi.forEach(pr => productHoldings.push(pr))
         await holdingFi.dispose();
       }
